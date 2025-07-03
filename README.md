@@ -1,3 +1,5 @@
+![Banner](./banner.png)
+
 # 🌍 Andrew's Travel Blog
 
 A clean, minimal travel blog built with **Next.js**, **TypeScript**, and **Tailwind CSS**.
