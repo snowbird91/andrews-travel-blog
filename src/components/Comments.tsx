@@ -84,17 +84,17 @@ export default function Comments({ blogSlug }: CommentsProps) {
   // If Supabase is not configured, show a message
   if (!isSupabaseConfigured) {
     return (
-      <div className="mt-12 border-t pt-8">
+      <div className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
         <div className="flex items-center space-x-2 mb-6">
-          <MessageCircle className="h-6 w-6 text-gray-600" />
-          <h3 className="text-xl font-semibold text-gray-900">Comments</h3>
+          <MessageCircle className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Comments</h3>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-          <div className="flex items-center space-x-2 text-blue-800">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+          <div className="flex items-center space-x-2 text-blue-800 dark:text-blue-300">
             <AlertCircle className="h-5 w-5" />
             <p className="font-medium">Comments System Coming Soon!</p>
           </div>
-          <p className="text-blue-700 mt-1">
+          <p className="text-blue-700 dark:text-blue-400 mt-1">
             The commenting system will be available once the database is configured.
           </p>
         </div>
@@ -131,10 +131,10 @@ export default function Comments({ blogSlug }: CommentsProps) {
   }
 
   return (
-    <div className="mt-12 border-t pt-8">
+    <div className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
       <div className="flex items-center space-x-2 mb-6">
-        <MessageCircle className="h-6 w-6 text-gray-600" />
-        <h3 className="text-xl font-semibold text-gray-900">
+        <MessageCircle className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
           Comments ({comments.length})
         </h3>
       </div>
@@ -143,7 +143,7 @@ export default function Comments({ blogSlug }: CommentsProps) {
       {user ? (
         <form onSubmit={handleSubmitComment} className="mb-8">
           <div className="mb-4">
-            <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="comment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Add a comment
             </label>
             <textarea
@@ -151,7 +151,7 @@ export default function Comments({ blogSlug }: CommentsProps) {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               placeholder="Share your thoughts..."
               required
             />
@@ -159,18 +159,18 @@ export default function Comments({ blogSlug }: CommentsProps) {
           <button
             type="submit"
             disabled={loading || !newComment.trim()}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+            className="flex items-center space-x-2 bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50"
           >
             <Send className="h-4 w-4" />
             <span>{loading ? 'Posting...' : 'Post Comment'}</span>
           </button>
         </form>
       ) : (
-        <div className="mb-8 p-4 bg-gray-50 rounded-md">
-          <p className="text-gray-700 mb-4">Please login to leave a comment.</p>
+        <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">Please login to leave a comment.</p>
           <button
             onClick={() => setShowAuth(!showAuth)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-800"
           >
             {showAuth ? 'Hide Login' : 'Login / Sign Up'}
           </button>
@@ -185,21 +185,21 @@ export default function Comments({ blogSlug }: CommentsProps) {
       {/* Comments List */}
       <div className="space-y-6">
         {comments.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">
             No comments yet. Be the first to share your thoughts!
           </p>
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} className="bg-gray-50 p-4 rounded-md">
+            <div key={comment.id} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-gray-900 dark:text-white">
                   {comment.user_name}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                 </span>
               </div>
-              <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{comment.content}</p>
             </div>
           ))
         )}

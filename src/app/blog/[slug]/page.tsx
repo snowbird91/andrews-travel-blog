@@ -52,7 +52,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   return (
-    <article className="min-h-screen bg-white">
+    <article className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         <img
@@ -93,7 +93,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="prose prose-lg max-w-none">
+        <div className="prose prose-lg dark:prose-invert max-w-none">
           <Markdown
             options={{
               overrides: {
@@ -111,13 +111,13 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
         {/* Tags */}
         {post.tags.length > 0 && (
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
+          <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 dark:bg-blue-500/20 text-primary dark:text-blue-400"
                 >
                   <Tag className="h-3 w-3 mr-1" />
                   {tag}
@@ -131,7 +131,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         <Comments blogSlug={params.slug} />
 
         {/* Navigation */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <Link
             href="/blog"
             className="inline-flex items-center btn-primary"

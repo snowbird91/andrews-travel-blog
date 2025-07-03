@@ -29,8 +29,8 @@ export default function UserProfile({ user, onLogout }: UserProfileProps) {
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2">
-        <UserIcon className="h-5 w-5 text-gray-600" />
-        <span className="text-sm text-gray-700">
+        <UserIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+        <span className="text-sm text-gray-700 dark:text-gray-300">
           {user.user_metadata?.full_name || user.email}
         </span>
       </div>
@@ -38,7 +38,7 @@ export default function UserProfile({ user, onLogout }: UserProfileProps) {
       <button
         onClick={handleLogout}
         disabled={loading}
-        className="flex items-center space-x-1 text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+        className="flex items-center space-x-1 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 disabled:opacity-50"
       >
         <LogOut className="h-4 w-4" />
         <span>{loading ? 'Logging out...' : 'Logout'}</span>

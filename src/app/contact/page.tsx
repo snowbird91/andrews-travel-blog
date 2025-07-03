@@ -8,70 +8,70 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 fade-in">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Get In Touch
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Have questions about travel or want to share your own adventures? I'd love to hear from you!
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Me a Message</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Send Me a Message</h2>
             <form className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Name
                 </label>
                 <input
                   type="text"
                   id="name"
                   name="name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="Your name"
                 />
               </div>
               
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="your@email.com"
                 />
               </div>
               
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Subject
                 </label>
                 <input
                   type="text"
                   id="subject"
                   name="subject"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="What's this about?"
                 />
               </div>
               
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Message
                 </label>
                 <textarea
                   id="message"
                   name="message"
                   rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-vertical"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-blue-500 focus:border-transparent transition-colors resize-vertical"
                   placeholder="Tell me about your travel dreams, questions, or ideas..."
                 ></textarea>
               </div>
@@ -85,8 +85,8 @@ export default function ContactPage() {
               </button>
             </form>
             
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-700">
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
                 <strong>Note:</strong> This is just a demo form - emails won't actually send.
               </p>
             </div>
@@ -95,16 +95,16 @@ export default function ContactPage() {
           {/* Contact Information & Social */}
           <div className="space-y-8">
             {/* Contact Info */}
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Contact Information</h2>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <Mail className="h-5 w-5 text-primary mr-4" />
+                  <Mail className="h-5 w-5 text-primary dark:text-blue-400 mr-4" />
                   <div>
-                    <h3 className="font-medium text-gray-900">Email</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-white">Email</h3>
                     <a 
-                      href="mailto:"
-                      className="text-primary hover:tplaceholder@placeholder.comext-primary-dark transition-colors"
+                      href="mailto:placeholder@placeholder.com"
+                      className="text-primary dark:text-blue-400 hover:text-primary-dark dark:hover:text-blue-300 transition-colors"
                     >
                       placeholder@placeholder.com
                     </a>
@@ -112,19 +112,19 @@ export default function ContactPage() {
                 </div>
                 
                 <div className="flex items-center">
-                  <MapPin className="h-5 w-5 text-primary mr-4" />
+                  <MapPin className="h-5 w-5 text-primary dark:text-blue-400 mr-4" />
                   <div>
-                    <h3 className="font-medium text-gray-900">Location</h3>
-                    <p className="text-gray-600">Washington D.C., United States</p>
+                    <h3 className="font-medium text-gray-900 dark:text-white">Location</h3>
+                    <p className="text-gray-600 dark:text-gray-300">Washington D.C., United States</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Social Media */}
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Follow My Journey</h2>
-              <p className="text-gray-600 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Follow My Journey</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Follow my latest adventures!
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -160,7 +160,7 @@ export default function ContactPage() {
             </div>
 
             {/* Call to Action */}
-            <div className="bg-primary text-white rounded-lg shadow-md p-8">
+            <div className="bg-primary dark:bg-blue-600 text-white rounded-lg shadow-md p-8">
               <h2 className="text-2xl font-bold mb-4">Let's Connect!</h2>
               <p className="mb-6">
                 Always happy to connect with fellow travelers! 

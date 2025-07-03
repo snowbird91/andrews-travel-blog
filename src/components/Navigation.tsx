@@ -6,6 +6,7 @@ import { Menu, X, MapPin } from 'lucide-react';
 import { createClientSupabase, isSupabaseConfigured } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import UserProfile from './UserProfile';
+import DarkModeToggle from './DarkModeToggle';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,11 +50,11 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-primary">
+          <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-primary dark:text-blue-400">
             <MapPin className="h-6 w-6" />
             <span>Andrew's Travel Blog</span>
           </Link>
@@ -64,11 +65,14 @@ const Navigation = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-700 hover:text-primary px-3 py-2 font-medium transition-colors duration-200"
+                className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 font-medium transition-colors duration-200"
               >
                 {link.label}
               </Link>
             ))}
+            
+            {/* Dark Mode Toggle */}
+            <DarkModeToggle />
             
             {/* User Profile */}
             {user && (
@@ -80,7 +84,8 @@ const Navigation = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
+            <DarkModeToggle />
             {user && (
               <UserProfile 
                 user={user} 
@@ -89,7 +94,7 @@ const Navigation = () => {
             )}
             <button
               onClick={toggleMenu}
-              className="text-gray-700 hover:text-primary focus:outline-none focus:text-primary"
+              className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 focus:outline-none focus:text-primary"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -103,12 +108,12 @@ const Navigation = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-gray-700 hover:text-primary block px-3 py-2 font-medium transition-colors duration-200"
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 block px-3 py-2 font-medium transition-colors duration-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
