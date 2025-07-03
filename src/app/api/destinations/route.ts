@@ -1,8 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
-import fs from 'fs';
-import path from 'path';
+
+// Get admin emails from environment variable
+function getAdminEmails(): string[] {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return [];
+  return [adminEmail];
+}
+
+async function isAuthorized(request: NextRequest) {
+  // For development mode, allow all requests if no Supabase is configured
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return true;
+  }
+
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          storage: {
+            getItem: (key: string) => cookieStore.get(key)?.value,
+            setItem: () => {},
+            removeItem: () => {},
+          },
+        },
+      }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+    const adminEmails = getAdminEmails();
+    return user && adminEmails.includes(user.email || '');
+  } catch (error) {
+    return false;
+  }
+}
+
+// GET - List all destinations
+export async function GET() {
+  try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data: destinations, error } = await supabase
+      .from('destinations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    // Transform coordinates back to array format for frontend compatibility
+    const transformedDestinations = destinations?.map(dest => ({
+      id: dest.id,
+      name: dest.name,
+      country: dest.country,
+      coordinates: [
+        parseFloat(dest.coordinates.replace(/[()]/g, '').split(',')[0]),
+        parseFloat(dest.coordinates.replace(/[()]/g, '').split(',')[1])
+      ],
+      visited: dest.visited,
+      visitDate: dest.visit_date,
+      description: dest.description,
+      photos: dest.photos || [],
+      rating: dest.rating,
+      highlights: dest.highlights || [],
+      travelTips: dest.travel_tips || []
+    })) || [];
+
+    return NextResponse.json({ destinations: transformedDestinations });
+  } catch (error) {
+    console.error('Error reading destinations:', error);
+    return NextResponse.json({ error: 'Failed to load destinations' }, { status: 500 });
+  }
+}
 
 // Admin email check
 const getAdminEmails = () => {

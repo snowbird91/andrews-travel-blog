@@ -11,7 +11,11 @@
     "vercel:dev": "vercel dev",
     "validate": "node validate-deployment.js",
     "deploy-help": "node deploy-helper.js",
-    "clean": "rm -rf .next out node_modules/.cache"
+    "clean": "rm -rf .next out node_modules/.cache",
+    "setup-db": "node setup-database.js",
+    "verify-db": "node verify-setup.js",
+    "migrate": "node migrate-to-database.js",
+    "prepare-vercel": "node prepare-vercel.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

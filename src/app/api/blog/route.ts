@@ -1,41 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
-import fs from 'fs';
-import path from 'path';
 
-// Admin email check
-const getAdminEmails = () => {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  if (adminEmail) {
-    return [adminEmail];
-  }
-  // Fallback for development
-  return ['andrewliu3477@gmail.com'];
-};
+// Get admin emails from environment variable
+function getAdminEmails(): string[] {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return [];
+  return [adminEmail];
+}
 
 async function isAuthorized(request: NextRequest) {
-  // For development mode, allow all requests
-  if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  // For development mode, allow all requests if no Supabase is configured
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return true;
   }
 
   try {
     const cookieStore = cookies();
-    const supabase = createServerClient(
+    const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
+        auth: {
+          storage: {
+            getItem: (key: string) => cookieStore.get(key)?.value ?? null,
+            setItem: () => {},
+            removeItem: () => {},
           },
         },
       }
     );
 
     const { data: { user } } = await supabase.auth.getUser();
-    return user && getAdminEmails().includes(user.email || '');
+    const adminEmails = getAdminEmails();
+    return user && adminEmails.includes(user.email || '');
   } catch (error) {
     return false;
   }
@@ -44,49 +42,33 @@ async function isAuthorized(request: NextRequest) {
 // GET - List all blog posts
 export async function GET() {
   try {
-    const postsDir = path.join(process.cwd(), 'src', 'data', 'posts');
-    
-    if (!fs.existsSync(postsDir)) {
-      return NextResponse.json({ posts: [] });
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
-    
-    const files = fs.readdirSync(postsDir).filter(file => file.endsWith('.md'));
-    const posts = files.map(file => {
-      const filePath = path.join(postsDir, file);
-      const content = fs.readFileSync(filePath, 'utf8');
-      
-      // Extract frontmatter
-      const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-      if (frontmatterMatch) {
-        const frontmatter = frontmatterMatch[1];
-        const lines = frontmatter.split('\n');
-        const metadata: any = {};
-        
-        lines.forEach(line => {
-          const [key, ...valueParts] = line.split(':');
-          if (key && valueParts.length > 0) {
-            const value = valueParts.join(':').trim();
-            metadata[key.trim()] = value.replace(/^["']|["']$/g, '');
-          }
-        });
-        
-        return {
-          id: file.replace('.md', ''),
-          filename: file,
-          ...metadata,
-          content: content.replace(/^---\n[\s\S]*?\n---\n/, '')
-        };
-      }
-      
-      return {
-        id: file.replace('.md', ''),
-        filename: file,
-        title: file.replace('.md', '').replace(/-/g, ' '),
-        content
-      };
-    });
-    
-    return NextResponse.json({ posts });
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data: blogPosts, error } = await supabase
+      .from('blog_posts')
+      .select(`
+        *,
+        comments (
+          id,
+          author,
+          content,
+          created_at
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({ posts: blogPosts || [] });
   } catch (error) {
     console.error('Error reading blog posts:', error);
     return NextResponse.json({ error: 'Failed to load blog posts' }, { status: 500 });
@@ -100,43 +82,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const post = await request.json();
-    
-    // Generate filename from title
-    const filename = post.title
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // Generate slug from title
+    const slug = post.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '') + '.md';
-    
-    // Create markdown content with frontmatter
-    const frontmatter = [
-      '---',
-      `title: "${post.title}"`,
-      `date: "${post.date || new Date().toISOString().split('T')[0]}"`,
-      `author: "${post.author || 'Andrew'}"`,
-      `excerpt: "${post.excerpt || ''}"`,
-      `featured: ${post.featured || false}`,
-      `tags: [${(post.tags || []).map((tag: string) => `"${tag}"`).join(', ')}]`,
-      post.featuredImage ? `featuredImage: "${post.featuredImage}"` : '',
-      '---',
-      '',
-      post.content || ''
-    ].filter(line => line !== '').join('\n');
-    
-    // Ensure posts directory exists
-    const postsDir = path.join(process.cwd(), 'src', 'data', 'posts');
-    if (!fs.existsSync(postsDir)) {
-      fs.mkdirSync(postsDir, { recursive: true });
+      .replace(/^-|-$/g, '');
+
+    const { data: newPost, error } = await supabase
+      .from('blog_posts')
+      .insert([{
+        title: post.title,
+        slug: slug,
+        excerpt: post.excerpt || '',
+        content: post.content || '',
+        author: post.author || 'Andrew',
+        featured: post.featured || false,
+        featured_image: post.featuredImage || null,
+        tags: post.tags || [],
+        published: post.published || true,
+        destination_id: post.destinationId || null
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
     }
-    
-    // Write the file
-    const filePath = path.join(postsDir, filename);
-    fs.writeFileSync(filePath, frontmatter, 'utf8');
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Blog post saved successfully!',
-      post: { ...post, id: filename.replace('.md', ''), filename }
+      message: 'Blog post created successfully!',
+      post: newPost
     });
   } catch (error) {
     console.error('Error creating blog post:', error);
@@ -151,15 +137,49 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const post = await request.json();
-    
-    // For now, just log and show success
-    console.log('Blog post would be updated:', post);
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // Generate slug from title if it's changed
+    const slug = post.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    const { data: updatedPost, error } = await supabase
+      .from('blog_posts')
+      .update({
+        title: post.title,
+        slug: slug,
+        excerpt: post.excerpt || '',
+        content: post.content || '',
+        author: post.author || 'Andrew',
+        featured: post.featured || false,
+        featured_image: post.featuredImage || null,
+        tags: post.tags || [],
+        published: post.published || true,
+        destination_id: post.destinationId || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', post.id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
     
     return NextResponse.json({ 
       success: true, 
       message: 'Blog post updated successfully!',
-      post 
+      post: updatedPost
     });
   } catch (error) {
     console.error('Error updating blog post:', error);
@@ -174,15 +194,31 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     
     if (!id) {
-      return NextResponse.json({ error: 'Blog post ID required' }, { status: 400 });
+      return NextResponse.json({ error: 'Blog post ID is required' }, { status: 400 });
     }
-    
-    // For now, just log and show success
-    console.log('Blog post would be deleted:', id);
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // Delete the blog post (comments will be deleted automatically due to CASCADE)
+    const { error } = await supabase
+      .from('blog_posts')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw error;
+    }
     
     return NextResponse.json({ 
       success: true, 

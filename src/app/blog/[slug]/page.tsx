@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Calendar, Clock, Tag, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import Markdown from 'markdown-to-jsx';
-import { getPostBySlug, getAllPosts } from '@/lib/staticBlog';
+import { BlogPost } from '@/types/blog';
 import Comments from '@/components/Comments';
 
 interface BlogPostPageProps {
@@ -13,16 +13,44 @@ interface BlogPostPageProps {
   };
 }
 
-export function generateStaticParams() {
-  const posts = getAllPosts();
+async function getAllPosts(): Promise<BlogPost[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                   'http://localhost:3000');
+    
+    const response = await fetch(`${baseUrl}/api/blog`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) return [];
+    
+    const data = await response.json();
+    return data.posts || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  try {
+    const posts = await getAllPosts();
+    return posts.find(post => post.slug === slug) || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
   
   return posts.map((post) => ({
     slug: post.slug,
   }));
 }
 
-export function generateMetadata({ params }: BlogPostPageProps): Metadata {
-  const post = getPostBySlug(params.slug);
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug);
   
   if (!post) {
     return {
@@ -37,15 +65,15 @@ export function generateMetadata({ params }: BlogPostPageProps): Metadata {
       title: post.title,
       description: post.excerpt,
       type: 'article',
-      publishedTime: post.date,
+      publishedTime: post.date || post.created_at,
       authors: [post.author],
-      images: [post.coverImage],
+      images: [post.coverImage || post.featured_image || ''],
     },
   };
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const post = await getPostBySlug(params.slug);
 
   if (!post) {
     notFound();
@@ -56,7 +84,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
       {/* Hero Section */}
       <div className="relative h-96 overflow-hidden">
         <img
-          src={post.coverImage}
+          src={post.coverImage || post.featured_image || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}
           alt={post.title}
           className="w-full h-full object-cover"
         />
@@ -77,12 +105,14 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="flex flex-wrap items-center text-white/90 text-sm">
               <div className="flex items-center mr-6 mb-2">
                 <Calendar className="h-4 w-4 mr-2" />
-                {format(new Date(post.date), 'MMMM dd, yyyy')}
+                {format(new Date(post.date || post.created_at || new Date()), 'MMMM dd, yyyy')}
               </div>
-              <div className="flex items-center mr-6 mb-2">
-                <Clock className="h-4 w-4 mr-2" />
-                {post.readTime} min read
-              </div>
+              {post.readTime && (
+                <div className="flex items-center mr-6 mb-2">
+                  <Clock className="h-4 w-4 mr-2" />
+                  {post.readTime} min read
+                </div>
+              )}
               <div className="flex items-center mb-2">
                 By {post.author}
               </div>
