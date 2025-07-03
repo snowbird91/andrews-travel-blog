@@ -5,6 +5,7 @@ import { Calendar, Clock, Tag, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import Markdown from 'markdown-to-jsx';
 import { getPostBySlug, getAllPosts } from '@/lib/staticBlog';
+import Comments from '@/components/Comments';
 
 interface BlogPostPageProps {
   params: {
@@ -125,6 +126,9 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </div>
         )}
+
+        {/* Comments Section */}
+        <Comments blogSlug={params.slug} />
 
         {/* Navigation */}
         <div className="mt-12 pt-8 border-t border-gray-200">

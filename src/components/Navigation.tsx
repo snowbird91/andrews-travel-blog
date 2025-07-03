@@ -1,11 +1,41 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, MapPin } from 'lucide-react';
+import { createClientSupabase, isSupabaseConfigured } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
+import UserProfile from './UserProfile';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const supabase = createClientSupabase();
+    
+    // Check if user is authenticated
+    const getUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error('Error getting user:', error);
+      }
+    };
+    getUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -29,7 +59,7 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -39,10 +69,24 @@ const Navigation = () => {
                 {link.label}
               </Link>
             ))}
+            
+            {/* User Profile */}
+            {user && (
+              <UserProfile 
+                user={user} 
+                onLogout={() => setUser(null)} 
+              />
+            )}
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-4">
+            {user && (
+              <UserProfile 
+                user={user} 
+                onLogout={() => setUser(null)} 
+              />
+            )}
             <button
               onClick={toggleMenu}
               className="text-gray-700 hover:text-primary focus:outline-none focus:text-primary"
