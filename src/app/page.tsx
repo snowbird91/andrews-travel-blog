@@ -1,9 +1,12 @@
 import HeroSection from '@/components/HeroSection';
 import FeaturedPosts from '@/components/FeaturedPosts';
 import BlogPreview from '@/components/BlogPreview';
+import InteractiveTravelMap from '@/components/InteractiveTravelMap';
+import TravelStats from '@/components/TravelStats';
 import Link from 'next/link';
 import { getFeaturedPosts, getAllPosts } from '@/lib/staticBlog';
-import { ArrowRight } from 'lucide-react';
+import { travelDestinations } from '@/data/travelData';
+import { ArrowRight, MapPin } from 'lucide-react';
 
 export default function HomePage() {
   const featuredPosts = getFeaturedPosts();
@@ -12,6 +15,45 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
+      
+      {/* Travel Map Preview Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              My Travel Journey
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+              Explore the places I've visited and discover where I'm planning to go next on my interactive world map.
+            </p>
+          </div>
+          
+          {/* Travel Stats Preview */}
+          <div className="mb-8">
+            <TravelStats />
+          </div>
+          
+          {/* Map Preview */}
+          <div className="mb-8 fade-in">
+            <InteractiveTravelMap 
+              destinations={travelDestinations} 
+              height="400px"
+              showControls={false}
+            />
+          </div>
+          
+          <div className="text-center fade-in">
+            <Link
+              href="/travel-map"
+              className="inline-flex items-center btn-primary"
+            >
+              <MapPin className="mr-2 h-5 w-5" />
+              Explore Full Travel Map
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
       
       {/* Featured Posts Section */}
       {featuredPosts.length > 0 && (

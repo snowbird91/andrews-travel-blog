@@ -45,6 +45,7 @@ const Navigation = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/blog', label: 'Blog' },
+    { href: '/travel-map', label: 'Travel Map' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
