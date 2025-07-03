@@ -40,12 +40,29 @@ const AdminDashboard: React.FC = () => {
     setShowDeleteConfirm({ type, id, name });
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (showDeleteConfirm) {
-      // TODO: Implement actual delete functionality
-      // For now, just show an alert that this would delete the item
-      alert(`This would delete ${showDeleteConfirm.type}: ${showDeleteConfirm.name}\n\nNote: Delete functionality requires backend integration.`);
-      setShowDeleteConfirm(null);
+      try {
+        const { type, id, name } = showDeleteConfirm;
+        
+        const endpoint = type === 'destination' ? '/api/destinations' : '/api/blog';
+        const response = await fetch(`${endpoint}?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          alert(`${name} has been deleted successfully!`);
+          // In a real app, you'd refresh the data here
+          setShowDeleteConfirm(null);
+        } else {
+          throw new Error(result.error || `Failed to delete ${type}`);
+        }
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        alert(`Error: ${error instanceof Error ? error.message : 'Failed to delete item'}`);
+      }
     }
   };
 

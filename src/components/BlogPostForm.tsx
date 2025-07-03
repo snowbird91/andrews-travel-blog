@@ -43,6 +43,8 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({
   });
 
   const [newTag, setNewTag] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
   useEffect(() => {
     if (post) {
@@ -90,29 +92,60 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setSaveMessage('');
     
-    // Generate ID if not provided
-    const postId = formData.id || 
-      formData.slug || 
-      `post-${Date.now()}`;
+    try {
+      // Generate ID if not provided
+      const postId = formData.id || 
+        formData.slug || 
+        `post-${Date.now()}`;
 
-    const blogPost: BlogPost = {
-      id: postId,
-      title: formData.title || '',
-      slug: formData.slug || postId,
-      excerpt: formData.excerpt || '',
-      content: formData.content || '',
-      author: formData.author || 'Andrew',
-      date: formData.date || new Date().toISOString().split('T')[0],
-      category: formData.category || 'Travel',
-      tags: formData.tags || [],
-      featured: formData.featured || false,
-      image: formData.image,
-    };
+      const blogPost: BlogPost = {
+        id: postId,
+        title: formData.title || '',
+        slug: formData.slug || postId,
+        excerpt: formData.excerpt || '',
+        content: formData.content || '',
+        author: formData.author || 'Andrew',
+        date: formData.date || new Date().toISOString().split('T')[0],
+        category: formData.category || 'Travel',
+        tags: formData.tags || [],
+        featured: formData.featured || false,
+        image: formData.image,
+      };
 
-    onSave(blogPost);
+      // Call API to save blog post
+      const method = post && post.id ? 'PUT' : 'POST';
+      const response = await fetch('/api/blog', {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(blogPost),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setSaveMessage(result.message || 'Blog post saved successfully!');
+        onSave(blogPost);
+        
+        // Close form after a brief delay to show success message
+        setTimeout(() => {
+          onCancel();
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to save blog post');
+      }
+    } catch (error) {
+      console.error('Error saving blog post:', error);
+      setSaveMessage(error instanceof Error ? error.message : 'Failed to save blog post');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -317,22 +350,44 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({
           </p>
         </div>
 
+        {/* Success/Error Message */}
+        {saveMessage && (
+          <div className={`p-4 rounded-md ${
+            saveMessage.includes('successfully') || saveMessage.includes('saved')
+              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700'
+              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700'
+          }`}>
+            {saveMessage}
+          </div>
+        )}
+
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={saving}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X className="h-4 w-4 mr-2 inline" />
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={saving}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save className="h-4 w-4 mr-2 inline" />
-            {post ? 'Update Post' : 'Create Post'}
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2 inline" />
+                {post ? 'Update Post' : 'Create Post'}
+              </>
+            )}
           </button>
         </div>
       </form>

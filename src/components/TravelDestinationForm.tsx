@@ -32,6 +32,8 @@ const TravelDestinationForm: React.FC<TravelDestinationFormProps> = ({
   const [newHighlight, setNewHighlight] = useState('');
   const [newTip, setNewTip] = useState('');
   const [newPhoto, setNewPhoto] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
 
   useEffect(() => {
     if (destination) {
@@ -110,29 +112,60 @@ const TravelDestinationForm: React.FC<TravelDestinationFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setSaveMessage('');
     
-    // Generate ID if not provided
-    const destinationId = formData.id || 
-      formData.name?.toLowerCase().replace(/[^a-z0-9]/g, '-') || 
-      `destination-${Date.now()}`;
+    try {
+      // Generate ID if not provided
+      const destinationId = formData.id || 
+        formData.name?.toLowerCase().replace(/[^a-z0-9]/g, '-') || 
+        `destination-${Date.now()}`;
 
-    const destination: TravelDestination = {
-      id: destinationId,
-      name: formData.name || '',
-      country: formData.country || '',
-      coordinates: formData.coordinates || [0, 0],
-      visited: formData.visited || false,
-      visitDate: formData.visitDate,
-      description: formData.description || '',
-      photos: formData.photos || [],
-      rating: formData.rating,
-      highlights: formData.highlights || [],
-      travelTips: formData.travelTips || [],
-    };
+      const destination: TravelDestination = {
+        id: destinationId,
+        name: formData.name || '',
+        country: formData.country || '',
+        coordinates: formData.coordinates || [0, 0],
+        visited: formData.visited || false,
+        visitDate: formData.visitDate,
+        description: formData.description || '',
+        photos: formData.photos || [],
+        rating: formData.rating,
+        highlights: formData.highlights || [],
+        travelTips: formData.travelTips || [],
+      };
 
-    onSave(destination);
+      // Call API to save destination
+      const method = destination.id && destination.id !== destinationId ? 'PUT' : 'POST';
+      const response = await fetch('/api/destinations', {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(destination),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setSaveMessage(result.message || 'Destination saved successfully!');
+        onSave(destination);
+        
+        // Close form after a brief delay to show success message
+        setTimeout(() => {
+          onCancel();
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to save destination');
+      }
+    } catch (error) {
+      console.error('Error saving destination:', error);
+      setSaveMessage(error instanceof Error ? error.message : 'Failed to save destination');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -381,22 +414,44 @@ const TravelDestinationForm: React.FC<TravelDestinationFormProps> = ({
           </div>
         </div>
 
+        {/* Success/Error Message */}
+        {saveMessage && (
+          <div className={`p-4 rounded-md ${
+            saveMessage.includes('successfully') || saveMessage.includes('saved')
+              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700'
+              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700'
+          }`}>
+            {saveMessage}
+          </div>
+        )}
+
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={saving}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X className="h-4 w-4 mr-2 inline" />
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={saving}
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save className="h-4 w-4 mr-2 inline" />
-            Save Destination
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2 inline" />
+                Save Destination
+              </>
+            )}
           </button>
         </div>
       </form>
