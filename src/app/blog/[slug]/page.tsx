@@ -65,8 +65,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: post.title,
       description: post.excerpt,
       type: 'article',
-      publishedTime: post.date || post.created_at,
-      authors: [post.author],
+      publishedTime: post.created_at,
+      authors: [post.author || 'Andrew'],
       images: [post.coverImage || post.featured_image || ''],
     },
   };
@@ -105,7 +105,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="flex flex-wrap items-center text-white/90 text-sm">
               <div className="flex items-center mr-6 mb-2">
                 <Calendar className="h-4 w-4 mr-2" />
-                {format(new Date(post.date || post.created_at || new Date()), 'MMMM dd, yyyy')}
+                {format(new Date(post.created_at || new Date()), 'MMMM dd, yyyy')}
               </div>
               {post.readTime && (
                 <div className="flex items-center mr-6 mb-2">
@@ -114,7 +114,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
               )}
               <div className="flex items-center mb-2">
-                By {post.author}
+                By {post.author || 'Andrew'}
               </div>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         {/* Tags */}
-        {post.tags.length > 0 && (
+        {post.tags && post.tags.length > 0 && (
           <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
