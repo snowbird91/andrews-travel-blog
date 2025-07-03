@@ -3,8 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 async function isAuthorized(request: NextRequest) {
-  // For development mode, allow all requests if no Supabase is configured
+  // For development mode, allow all requests if no Supabase is configured OR if admin email is set
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return true;
+  }
+
+  // In development mode with admin email set, allow admin operations
+  if (process.env.NODE_ENV === 'development' && process.env.ADMIN_EMAIL) {
+    console.log('Development mode: allowing admin operations for admin email');
     return true;
   }
 
