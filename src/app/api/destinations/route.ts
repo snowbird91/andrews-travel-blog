@@ -5,9 +5,14 @@ import fs from 'fs';
 import path from 'path';
 
 // Admin email check
-const ADMIN_EMAILS = [
-  'andrewliu3477@gmail.com', // Replace with your actual email
-];
+const getAdminEmails = () => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  if (adminEmail) {
+    return [adminEmail];
+  }
+  // Fallback for development
+  return ['andrewliu3477@gmail.com'];
+};
 
 async function isAuthorized(request: NextRequest) {
   // For development mode, allow all requests
@@ -30,7 +35,7 @@ async function isAuthorized(request: NextRequest) {
     );
 
     const { data: { user } } = await supabase.auth.getUser();
-    return user && ADMIN_EMAILS.includes(user.email || '');
+    return user && getAdminEmails().includes(user.email || '');
   } catch (error) {
     return false;
   }

@@ -6,12 +6,15 @@ import { Menu, X, MapPin } from 'lucide-react';
 import { createClientSupabase, isSupabaseConfigured } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
 import UserProfile from './UserProfile';
-import DarkModeToggle from './DarkModeToggle';
-
-// Admin email addresses (should match AdminGuard)
-const ADMIN_EMAILS = [
-  'andrewliu3477@gmail.com', // Replace with your actual email
-];
+import DarkModeToggle from './DarkModeToggle';  // Admin email addresses (should match AdminGuard)
+  const getAdminEmails = () => {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    if (adminEmail) {
+      return [adminEmail];
+    }
+    // Fallback for development
+    return ['andrewliu3477@gmail.com'];
+  };
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,7 +35,7 @@ const Navigation = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
-        setIsAdmin(user ? ADMIN_EMAILS.includes(user.email || '') : false);
+        setIsAdmin(user ? getAdminEmails().includes(user.email || '') : false);
       } catch (error) {
         console.error('Error getting user:', error);
       }
@@ -44,7 +47,7 @@ const Navigation = () => {
       (event, session) => {
         const currentUser = session?.user || null;
         setUser(currentUser);
-        setIsAdmin(currentUser ? ADMIN_EMAILS.includes(currentUser.email || '') : false);
+        setIsAdmin(currentUser ? getAdminEmails().includes(currentUser.email || '') : false);
       }
     );
 
