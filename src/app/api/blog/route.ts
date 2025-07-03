@@ -32,8 +32,17 @@ async function isAuthorized(request: NextRequest) {
     );
 
     const { data: { user } } = await supabase.auth.getUser();
-    const adminEmails = getAdminEmails();
-    return user && adminEmails.includes(user.email || '');
+    
+    if (!user) return false;
+    
+    // Check if user has admin role in profiles table
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    
+    return profile?.role === 'admin';
   } catch (error) {
     return false;
   }

@@ -9,10 +9,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const postId = searchParams.get('postId');
+    const blogSlug = searchParams.get('blogSlug');
     
-    if (!postId) {
-      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
+    if (!blogSlug) {
+      return NextResponse.json({ error: 'Blog slug is required' }, { status: 400 });
     }
 
     const supabase = createClient(
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const { data: comments, error } = await supabase
       .from('comments')
       .select('*')
-      .eq('post_id', postId)
+      .eq('blog_slug', blogSlug)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -50,13 +50,21 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     const { data: newComment, error } = await supabase
       .from('comments')
       .insert([{
-        post_id: comment.postId,
-        author: comment.author,
-        email: comment.email,
-        content: comment.content
+        blog_slug: comment.blogSlug,
+        user_id: user.id,
+        content: comment.content,
+        user_email: user.email,
+        user_name: comment.userName || user.user_metadata?.full_name || 'Anonymous'
       }])
       .select()
       .single();
