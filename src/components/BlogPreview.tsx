@@ -12,7 +12,7 @@ const BlogPreview = ({ post }: BlogPreviewProps) => {
     <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 hover-scale overflow-hidden">
       <div className="relative h-48 overflow-hidden">
         <img
-          src={post.coverImage}
+          src={post.coverImage || post.featured_image || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}
           alt={post.title}
           className="w-full h-full object-cover"
         />
@@ -22,9 +22,13 @@ const BlogPreview = ({ post }: BlogPreviewProps) => {
       <div className="p-6">
         <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
           <Calendar className="h-4 w-4 mr-1" />
-          <span className="mr-4">{format(new Date(post.date), 'MMM dd, yyyy')}</span>
-          <Clock className="h-4 w-4 mr-1" />
-          <span>{post.readTime} min read</span>
+          <span className="mr-4">{format(new Date(post.date || post.created_at || new Date()), 'MMM dd, yyyy')}</span>
+          {post.readTime && (
+            <>
+              <Clock className="h-4 w-4 mr-1" />
+              <span>{post.readTime} min read</span>
+            </>
+          )}
         </div>
         
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
