@@ -97,7 +97,20 @@ export async function POST(request: NextRequest) {
     
     // Generate new file content
     const newContent = `// Auto-generated travel data
-import { TravelDestination } from '@/types/travel';
+export interface TravelDestination {
+  id: string;
+  name: string;
+  country: string;
+  coordinates: [number, number]; // [latitude, longitude]
+  visited: boolean;
+  visitDate?: string;
+  description: string;
+  photos?: string[];
+  blogPosts?: string[]; // slugs of related blog posts
+  rating?: number; // 1-5 stars
+  highlights?: string[];
+  travelTips?: string[];
+}
 
 export const travelDestinations: TravelDestination[] = ${JSON.stringify(destinations, null, 2)};
 `;
@@ -152,7 +165,20 @@ export async function PUT(request: NextRequest) {
     
     // Generate new file content
     const newContent = `// Auto-generated travel data
-import { TravelDestination } from '@/types/travel';
+export interface TravelDestination {
+  id: string;
+  name: string;
+  country: string;
+  coordinates: [number, number]; // [latitude, longitude]
+  visited: boolean;
+  visitDate?: string;
+  description: string;
+  photos?: string[];
+  blogPosts?: string[]; // slugs of related blog posts
+  rating?: number; // 1-5 stars
+  highlights?: string[];
+  travelTips?: string[];
+}
 
 export const travelDestinations: TravelDestination[] = ${JSON.stringify(destinations, null, 2)};
 `;
@@ -211,7 +237,20 @@ export async function DELETE(request: NextRequest) {
     
     // Generate new file content
     const newContent = `// Auto-generated travel data
-import { TravelDestination } from '@/types/travel';
+export interface TravelDestination {
+  id: string;
+  name: string;
+  country: string;
+  coordinates: [number, number]; // [latitude, longitude]
+  visited: boolean;
+  visitDate?: string;
+  description: string;
+  photos?: string[];
+  blogPosts?: string[]; // slugs of related blog posts
+  rating?: number; // 1-5 stars
+  highlights?: string[];
+  travelTips?: string[];
+}
 
 export const travelDestinations: TravelDestination[] = ${JSON.stringify(destinations, null, 2)};
 `;
