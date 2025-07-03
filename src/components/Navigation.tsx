@@ -48,6 +48,7 @@ const Navigation = () => {
     { href: '/travel-map', label: 'Travel Map' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
+    { href: '/admin', label: 'Admin', requireAuth: false }, // Set to true if you want to require authentication
   ];
 
   return (

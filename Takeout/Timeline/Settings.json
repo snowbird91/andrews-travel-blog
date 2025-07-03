@@ -1,0 +1,165 @@
+{
+  "createdTime": "2015-12-07T22:42:54.670Z",
+  "modifiedTime": "2025-07-03T15:47:39.267Z",
+  "deviceSettings": [{
+    "deviceTag": -1919644508,
+    "reportingEnabled": false,
+    "devicePrettyName": "SM-S928U",
+    "platformType": "ANDROID",
+    "deviceCreationTime": "2025-06-26T12:30:59.696Z",
+    "latestLocationReportingSettingChange": {
+      "reportingEnabledModificationTime": "2025-06-26T12:30:59.696Z"
+    },
+    "androidOsLevel": 35,
+    "deviceSpec": {
+      "manufacturer": "samsung",
+      "brand": "samsung",
+      "product": "e3qsqw",
+      "device": "e3q",
+      "model": "SM-S928U",
+      "isLowRam": false
+    },
+    "deviceActiveness": {
+      "hasSavedTimelineData": false
+    }
+  }, {
+    "deviceTag": 1609507521,
+    "reportingEnabled": false,
+    "devicePrettyName": "SM-G986U",
+    "platformType": "ANDROID",
+    "deviceCreationTime": "2025-06-24T16:27:04.831Z",
+    "latestLocationReportingSettingChange": {
+      "reportingEnabledModificationTime": "2025-06-24T16:27:04.831Z"
+    },
+    "androidOsLevel": 33,
+    "deviceSpec": {
+      "manufacturer": "samsung",
+      "brand": "samsung",
+      "product": "y2qsqw",
+      "device": "y2q",
+      "model": "SM-G986U",
+      "isLowRam": false
+    },
+    "deviceActiveness": {
+      "hasSavedTimelineData": true,
+      "observedPlaceVisitsFor30PercentOfTheLast7d": true
+    }
+  }, {
+    "deviceTag": -2020998111,
+    "reportingEnabled": false,
+    "legalCountryCode": "jp",
+    "devicePrettyName": "iPhone",
+    "platformType": "IOS",
+    "deviceCreationTime": "2025-04-13T10:03:58.564Z",
+    "latestLocationReportingSettingChange": {
+      "reportingEnabledModificationTime": "2025-04-13T10:03:58.564Z"
+    },
+    "iosVersion": "18.4",
+    "deviceSpec": {
+      "device": "iPhone13,4"
+    },
+    "deviceActiveness": {
+      "hasSavedTimelineData": true,
+      "observedPlaceVisitsFor30PercentOfTheLast7d": false
+    }
+  }, {
+    "deviceTag": 1765417159,
+    "reportingEnabled": false,
+    "devicePrettyName": "Pixel 7a",
+    "platformType": "ANDROID",
+    "deviceCreationTime": "2023-11-15T15:17:41.633Z",
+    "latestLocationReportingSettingChange": {
+      "reportingEnabledModificationTime": "2025-03-05T05:01:00.914Z"
+    },
+    "androidOsLevel": 35,
+    "deviceSpec": {
+      "manufacturer": "Google",
+      "brand": "google",
+      "product": "lynx",
+      "device": "lynx",
+      "model": "Pixel 7a",
+      "isLowRam": false
+    },
+    "deviceActiveness": {
+      "hasSavedTimelineData": true,
+      "observedPlaceVisitsFor30PercentOfTheLast7d": true
+    }
+  }, {
+    "deviceTag": -909607119,
+    "reportingEnabled": false,
+    "legalCountryCode": "us",
+    "devicePrettyName": "iPad",
+    "platformType": "IOS",
+    "deviceCreationTime": "2023-07-30T22:58:49.747Z",
+    "latestLocationReportingSettingChange": {
+      "reportingEnabledModificationTime": "2025-03-05T21:00:23.146Z"
+    },
+    "iosVersion": "17.7",
+    "deviceSpec": {
+      "device": "iPad12,1"
+    },
+    "deviceActiveness": {
+      "hasSavedTimelineData": false
+    }
+  }, {
+    "deviceTag": 257826629,
+    "reportingEnabled": false,
+    "legalCountryCode": "us",
+    "devicePrettyName": "iPad",
+    "platformType": "IOS",
+    "deviceCreationTime": "2022-01-16T15:22:16.484Z",
+    "latestLocationReportingSettingChange": {
+      "reportingEnabledModificationTime": "2025-03-05T21:00:23.146Z"
+    },
+    "iosVersion": "17.1.2",
+    "deviceSpec": {
+      "device": "iPad7,11"
+    },
+    "deviceActiveness": {
+      "hasSavedTimelineData": false
+    }
+  }],
+  "hasReportedLocations": true,
+  "hasSetRetention": false,
+  "storeVisitControl": {
+    "enabled": true,
+    "updateTime": "2022-07-19T00:25:11.650506708Z"
+  },
+  "timelineEditUploadsControl": {
+    "enabled": true,
+    "updateTime": "2025-03-05T04:14:02.317032272Z"
+  },
+  "encryptedBackupsControls": {
+    "-2020998111": {
+      "enabled": false
+    },
+    "-1919644508": {
+      "enabled": false
+    },
+    "-909607119": {
+      "enabled": false
+    },
+    "257826629": {
+      "enabled": false
+    },
+    "1609507521": {
+      "enabled": false
+    },
+    "1765417159": {
+      "enabled": true,
+      "updateTime": "2025-07-03T15:47:39.267625759Z"
+    }
+  },
+  "retentionControl": {
+    "retentionWindowDays": 2147483647
+  },
+  "timelineEnabled": true,
+  "timelineDeletionTime": "2025-03-06T22:21:32.874Z",
+  "latestTimelineSettingChange": {
+    "timelineEnabledModificationTime": "2023-12-19T21:26:12.192Z"
+  },
+  "googleOpinionRewardsControl": {
+    "enabled": true,
+    "updateTime": "2024-11-14T11:51:23.886690208Z"
+  }
+}

@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build",
-    "deploy:build": "npm run build",
-    "deploy:github": "npm run build && echo 'Upload the contents of the out/ folder to your GitHub Pages repository'",
+    "vercel": "vercel",
+    "vercel:dev": "vercel dev",
+    "validate": "node validate-deployment.js",
+    "deploy-help": "node deploy-helper.js",
     "clean": "rm -rf .next out node_modules/.cache"
   },
   "dependencies": {
