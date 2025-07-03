@@ -54,7 +54,8 @@ const AdminDashboard: React.FC = () => {
 
         if (response.ok && result.success) {
           alert(`${name} has been deleted successfully!`);
-          // In a real app, you'd refresh the data here
+          // Refresh the page to show updated data
+          window.location.reload();
           setShowDeleteConfirm(null);
         } else {
           throw new Error(result.error || `Failed to delete ${type}`);

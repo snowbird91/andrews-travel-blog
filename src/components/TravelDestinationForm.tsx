@@ -153,9 +153,9 @@ const TravelDestinationForm: React.FC<TravelDestinationFormProps> = ({
         setSaveMessage(result.message || 'Destination saved successfully!');
         onSave(destination);
         
-        // Close form after a brief delay to show success message
+        // Close form and refresh page after a brief delay to show success message
         setTimeout(() => {
-          onCancel();
+          window.location.reload();
         }, 1500);
       } else {
         throw new Error(result.error || 'Failed to save destination');

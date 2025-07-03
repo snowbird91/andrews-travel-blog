@@ -71,9 +71,34 @@ export async function POST(request: NextRequest) {
     destination.id = `dest_${Date.now()}`;
     destination.dateAdded = new Date().toISOString();
     
-    // For now, we'll store in memory and show success
-    // In a real app, you'd save to a database
-    console.log('New destination would be saved:', destination);
+    // Read current destinations
+    const filePath = path.join(process.cwd(), 'src', 'data', 'travelData.ts');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    
+    // Extract the destinations array
+    const match = fileContent.match(/export const travelDestinations.*?=\s*(\[[\s\S]*?\]);/);
+    let destinations = [];
+    
+    if (match) {
+      try {
+        destinations = eval(match[1]);
+      } catch (error) {
+        console.error('Error parsing destinations:', error);
+      }
+    }
+    
+    // Add new destination
+    destinations.push(destination);
+    
+    // Generate new file content
+    const newContent = `// Auto-generated travel data
+import { TravelDestination } from '@/types/travel';
+
+export const travelDestinations: TravelDestination[] = ${JSON.stringify(destinations, null, 2)};
+`;
+    
+    // Write back to file
+    fs.writeFileSync(filePath, newContent, 'utf8');
     
     return NextResponse.json({ 
       success: true, 
@@ -93,16 +118,47 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const destination = await request.json();
-    destination.dateUpdated = new Date().toISOString();
+    const updatedDestination = await request.json();
+    updatedDestination.dateUpdated = new Date().toISOString();
     
-    // For now, we'll just log and show success
-    console.log('Destination would be updated:', destination);
+    // Read current destinations
+    const filePath = path.join(process.cwd(), 'src', 'data', 'travelData.ts');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    
+    // Extract the destinations array
+    const match = fileContent.match(/export const travelDestinations.*?=\s*(\[[\s\S]*?\]);/);
+    let destinations = [];
+    
+    if (match) {
+      try {
+        destinations = eval(match[1]);
+      } catch (error) {
+        console.error('Error parsing destinations:', error);
+      }
+    }
+    
+    // Update the destination
+    const index = destinations.findIndex((d: any) => d.id === updatedDestination.id);
+    if (index !== -1) {
+      destinations[index] = updatedDestination;
+    } else {
+      return NextResponse.json({ error: 'Destination not found' }, { status: 404 });
+    }
+    
+    // Generate new file content
+    const newContent = `// Auto-generated travel data
+import { TravelDestination } from '@/types/travel';
+
+export const travelDestinations: TravelDestination[] = ${JSON.stringify(destinations, null, 2)};
+`;
+    
+    // Write back to file
+    fs.writeFileSync(filePath, newContent, 'utf8');
     
     return NextResponse.json({ 
       success: true, 
       message: 'Destination updated successfully!',
-      destination 
+      destination: updatedDestination 
     });
   } catch (error) {
     console.error('Error updating destination:', error);
@@ -124,8 +180,39 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Destination ID required' }, { status: 400 });
     }
     
-    // For now, we'll just log and show success
-    console.log('Destination would be deleted:', id);
+    // Read current destinations
+    const filePath = path.join(process.cwd(), 'src', 'data', 'travelData.ts');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    
+    // Extract the destinations array
+    const match = fileContent.match(/export const travelDestinations.*?=\s*(\[[\s\S]*?\]);/);
+    let destinations = [];
+    
+    if (match) {
+      try {
+        destinations = eval(match[1]);
+      } catch (error) {
+        console.error('Error parsing destinations:', error);
+      }
+    }
+    
+    // Remove the destination
+    const initialLength = destinations.length;
+    destinations = destinations.filter((d: any) => d.id !== id);
+    
+    if (destinations.length === initialLength) {
+      return NextResponse.json({ error: 'Destination not found' }, { status: 404 });
+    }
+    
+    // Generate new file content
+    const newContent = `// Auto-generated travel data
+import { TravelDestination } from '@/types/travel';
+
+export const travelDestinations: TravelDestination[] = ${JSON.stringify(destinations, null, 2)};
+`;
+    
+    // Write back to file
+    fs.writeFileSync(filePath, newContent, 'utf8');
     
     return NextResponse.json({ 
       success: true, 

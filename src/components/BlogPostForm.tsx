@@ -133,9 +133,9 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({
         setSaveMessage(result.message || 'Blog post saved successfully!');
         onSave(blogPost);
         
-        // Close form after a brief delay to show success message
+        // Close form and refresh page after a brief delay to show success message
         setTimeout(() => {
-          onCancel();
+          window.location.reload();
         }, 1500);
       } else {
         throw new Error(result.error || 'Failed to save blog post');

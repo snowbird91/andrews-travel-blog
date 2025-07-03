@@ -118,11 +118,15 @@ export async function POST(request: NextRequest) {
       post.content || ''
     ].filter(line => line !== '').join('\n');
     
-    // For now, just log - in production you'd save to file system or database
-    console.log('New blog post would be saved:', {
-      filename,
-      content: frontmatter
-    });
+    // Ensure posts directory exists
+    const postsDir = path.join(process.cwd(), 'src', 'data', 'posts');
+    if (!fs.existsSync(postsDir)) {
+      fs.mkdirSync(postsDir, { recursive: true });
+    }
+    
+    // Write the file
+    const filePath = path.join(postsDir, filename);
+    fs.writeFileSync(filePath, frontmatter, 'utf8');
     
     return NextResponse.json({ 
       success: true, 

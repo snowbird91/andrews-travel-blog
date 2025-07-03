@@ -8,12 +8,22 @@ import { User } from '@supabase/supabase-js';
 import UserProfile from './UserProfile';
 import DarkModeToggle from './DarkModeToggle';
 
+// Admin email addresses (should match AdminGuard)
+const ADMIN_EMAILS = [
+  'andrewliu3477@gmail.com', // Replace with your actual email
+];
+
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured) {
+      // In development mode without Supabase, allow admin access
+      setIsAdmin(true);
+      return;
+    }
 
     const supabase = createClientSupabase();
     
@@ -22,6 +32,7 @@ const Navigation = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
+        setIsAdmin(user ? ADMIN_EMAILS.includes(user.email || '') : false);
       } catch (error) {
         console.error('Error getting user:', error);
       }
@@ -31,7 +42,9 @@ const Navigation = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setUser(session?.user || null);
+        const currentUser = session?.user || null;
+        setUser(currentUser);
+        setIsAdmin(currentUser ? ADMIN_EMAILS.includes(currentUser.email || '') : false);
       }
     );
 
@@ -42,13 +55,20 @@ const Navigation = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const navLinks = [
+  // Dynamic navigation links based on authentication state
+  const baseNavLinks = [
     { href: '/', label: 'Home' },
     { href: '/blog', label: 'Blog' },
     { href: '/travel-map', label: 'Travel Map' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
-    { href: '/admin', label: 'Admin', requireAuth: false }, // Set to true if you want to require authentication
+  ];
+
+  // Add Admin link only for authenticated admin users, or Login for non-authenticated users
+  const navLinks = [
+    ...baseNavLinks,
+    ...(isAdmin ? [{ href: '/admin', label: 'Admin' }] : []),
+    ...(!user ? [{ href: '/auth', label: 'Login' }] : []),
   ];
 
   return (
