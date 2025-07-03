@@ -4,13 +4,37 @@ import BlogPreview from '@/components/BlogPreview';
 import InteractiveTravelMap from '@/components/InteractiveTravelMap';
 import TravelStats from '@/components/TravelStats';
 import Link from 'next/link';
-import { getFeaturedPosts, getAllPosts } from '@/lib/staticBlog';
 import { travelDestinations } from '@/data/travelData';
 import { ArrowRight, MapPin } from 'lucide-react';
+import { BlogPost } from '@/types/blog';
 
-export default function HomePage() {
-  const featuredPosts = getFeaturedPosts();
-  const recentPosts = getAllPosts().slice(0, 3);
+async function getAllPosts(): Promise<BlogPost[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                   'http://localhost:3000');
+    
+    const response = await fetch(`${baseUrl}/api/blog`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch posts:', response.statusText);
+      return [];
+    }
+    
+    const data = await response.json();
+    return data.posts || [];
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const allPosts = await getAllPosts();
+  const featuredPosts = allPosts.filter(post => post.featured);
+  const recentPosts = allPosts.slice(0, 3);
 
   return (
     <>
@@ -68,7 +92,7 @@ export default function HomePage() {
               {featuredPosts.length > 0 ? 'Latest Posts' : 'Recent Posts'}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              {getAllPosts().length > 0 
+              {allPosts.length > 0 
                 ? 'Latest stories from the road'
                 : 'More stories coming soon!'
               }
