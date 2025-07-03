@@ -30,7 +30,11 @@ export const getPostBySlug = (slug: string): BlogPost | undefined => {
 };
 
 export const getAllPosts = (): BlogPost[] => {
-  return blogPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return blogPosts.sort((a, b) => {
+    const dateA = new Date(a.date || a.created_at || Date.now()).getTime();
+    const dateB = new Date(b.date || b.created_at || Date.now()).getTime();
+    return dateB - dateA;
+  });
 };
 
 export const getPostsByTag = (tag: string): BlogPost[] => {
