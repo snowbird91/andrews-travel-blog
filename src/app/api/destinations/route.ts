@@ -8,9 +8,9 @@ async function isAuthorized(request: NextRequest) {
     return true;
   }
 
-  // In development mode with admin email set, allow admin operations
-  if (process.env.NODE_ENV === 'development' && process.env.ADMIN_EMAIL) {
-    console.log('Development mode: allowing admin operations for admin email');
+  // If admin email is set (development or production), allow admin operations
+  if (process.env.ADMIN_EMAIL) {
+    console.log('Admin mode: allowing admin operations for admin email');
     return true;
   }
 
