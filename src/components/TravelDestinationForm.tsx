@@ -118,7 +118,7 @@ const TravelDestinationForm: React.FC<TravelDestinationFormProps> = ({
     setSaveMessage('');
     
     try {
-      // Generate ID if not provided
+      // Generate ID if not provided (for new destinations)
       const destinationId = formData.id || 
         formData.name?.toLowerCase().replace(/[^a-z0-9]/g, '-') || 
         `destination-${Date.now()}`;
@@ -137,8 +137,8 @@ const TravelDestinationForm: React.FC<TravelDestinationFormProps> = ({
         travelTips: formData.travelTips || [],
       };
 
-      // Call API to save destination
-      const method = destination.id && destination.id !== destinationId ? 'PUT' : 'POST';
+      // Use PUT if we have an existing ID (editing), POST if creating new
+      const method = formData.id ? 'PUT' : 'POST';
       const response = await fetch('/api/destinations', {
         method,
         headers: {

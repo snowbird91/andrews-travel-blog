@@ -1,14 +1,67 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import type { Metadata } from 'next';
 import InteractiveTravelMap from '@/components/InteractiveTravelMap';
 import TravelStats from '@/components/TravelStats';
-import { travelDestinations } from '@/data/travelData';
-
-export const metadata: Metadata = {
-  title: 'Travel Map - Andrew\'s Travel Blog',
-  description: 'Explore all the places I\'ve visited and places on my travel wishlist on this interactive world map.',
-};
+import { TravelDestination } from '@/data/travelData';
+import { Loader2 } from 'lucide-react';
 
 export default function TravelMapPage() {
+  const [destinations, setDestinations] = useState<TravelDestination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const response = await fetch('/api/destinations');
+        if (!response.ok) {
+          throw new Error('Failed to fetch destinations');
+        }
+        const data = await response.json();
+        setDestinations(data.destinations || []);
+      } catch (err) {
+        console.error('Error fetching destinations:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load destinations');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDestinations();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-300">Loading travel map...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">Error: {error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,7 +80,7 @@ export default function TravelMapPage() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
             Travel Statistics
           </h2>
-          <TravelStats />
+          <TravelStats destinations={destinations} />
         </div>
 
         {/* Interactive Map */}
@@ -36,7 +89,7 @@ export default function TravelMapPage() {
             Interactive World Map
           </h2>
           <InteractiveTravelMap 
-            destinations={travelDestinations} 
+            destinations={destinations} 
             height="600px"
             showControls={true}
           />
@@ -48,7 +101,7 @@ export default function TravelMapPage() {
             All Destinations
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {travelDestinations.map((destination) => (
+            {destinations.map((destination: TravelDestination) => (
               <div
                 key={destination.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
@@ -115,7 +168,7 @@ export default function TravelMapPage() {
                         Top Highlights:
                       </h4>
                       <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                        {destination.highlights.slice(0, 3).map((highlight, index) => (
+                        {destination.highlights?.slice(0, 3).map((highlight: string, index: number) => (
                           <li key={index}>• {highlight}</li>
                         ))}
                       </ul>

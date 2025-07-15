@@ -2,12 +2,28 @@
 
 import React from 'react';
 import { MapPin, Flag, Calendar, Heart, Star } from 'lucide-react';
-import { getTravelStats, travelDestinations } from '@/data/travelData';
+import { TravelDestination } from '@/data/travelData';
 
-const TravelStats: React.FC = () => {
-  const stats = getTravelStats();
-  const visitedDestinations = travelDestinations.filter(dest => dest.visited);
-  const averageRating = visitedDestinations.reduce((acc, dest) => acc + (dest.rating || 0), 0) / visitedDestinations.length;
+interface TravelStatsProps {
+  destinations?: TravelDestination[];
+}
+
+const TravelStats: React.FC<TravelStatsProps> = ({ destinations = [] }) => {
+  // Calculate stats from provided destinations
+  const visitedDestinations = destinations.filter(dest => dest.visited);
+  const visitedCountries = Array.from(new Set(visitedDestinations.map(dest => dest.country)));
+  const totalCountries = Array.from(new Set(destinations.map(dest => dest.country)));
+  const averageRating = visitedDestinations.length > 0 
+    ? visitedDestinations.reduce((acc, dest) => acc + (dest.rating || 0), 0) / visitedDestinations.length
+    : 0;
+
+  const stats = {
+    visitedDestinations: visitedDestinations.length,
+    totalDestinations: destinations.length,
+    visitedCountries: visitedCountries.length,
+    totalCountries: totalCountries.length,
+    wishlistDestinations: destinations.length - visitedDestinations.length,
+  };
 
   const statItems = [
     {
