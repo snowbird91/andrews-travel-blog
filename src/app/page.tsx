@@ -4,7 +4,7 @@ import BlogPreview from '@/components/BlogPreview';
 import InteractiveTravelMap from '@/components/InteractiveTravelMap';
 import TravelStats from '@/components/TravelStats';
 import Link from 'next/link';
-import { travelDestinations } from '@/data/travelData';
+import { TravelDestination } from '@/data/travelData';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { BlogPost } from '@/types/blog';
 
@@ -31,8 +31,32 @@ async function getAllPosts(): Promise<BlogPost[]> {
   }
 }
 
+async function getAllDestinations(): Promise<TravelDestination[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
+                   'http://localhost:3000');
+    
+    const response = await fetch(`${baseUrl}/api/destinations`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch destinations:', response.statusText);
+      return [];
+    }
+    
+    const data = await response.json();
+    return data.destinations || [];
+  } catch (error) {
+    console.error('Error fetching destinations:', error);
+    return [];
+  }
+}
+
 export default async function HomePage() {
   const allPosts = await getAllPosts();
+  const allDestinations = await getAllDestinations();
   const featuredPosts = allPosts.filter(post => post.featured);
   const recentPosts = allPosts.slice(0, 3);
 
@@ -54,13 +78,13 @@ export default async function HomePage() {
           
           {/* Travel Stats Preview */}
           <div className="mb-8">
-            <TravelStats />
+            <TravelStats destinations={allDestinations} />
           </div>
           
           {/* Map Preview */}
           <div className="mb-8 fade-in">
             <InteractiveTravelMap 
-              destinations={travelDestinations} 
+              destinations={allDestinations} 
               height="400px"
               showControls={false}
             />
